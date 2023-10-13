@@ -56,32 +56,35 @@ char *strjoin(char *s1, char *s2)
 
 // UTILITIES UP
 // GET_NEXT_LINE RELATED DOWN
+
 char    *get_remainder(char *buff)
 {
-	int nl_i = ft_strchr(buff, '\n');
-		if(nl_i == -1)
-			return NULL;
-	int ret_size = ft_strlen(buff) - nl_i;
-	char *ret = malloc(ret_size + 1);
+	int start = ft_strchr(buff, '\n');
+		if(start == -1)
+			return buff;
+	start += 1;                                    //0 1 2 3  4 5 6 7
+	int ret_size = ft_strlen(buff) - start;   // b a d /n t e s t == test // start == 3 + 1 == 4 // 8 - 4 == 4 // 4 + 1 == 5 correct;
+	char *ret = malloc(ret_size + 1);       // start copying from index 4
 	int i = 0;
-	while(nl_i < ret_size)
+	while(start < ft_strlen(buff))
 	{
-		ret[i] = buff[nl_i];
+		ret[i] = buff[start];       //ret[0] == buff[4] correct;  buff[3] == buff[7] correct;
 		i ++;
-		nl_i ++;
+		start ++;
 	}
-	ret[i] = '\0';
+	ret[i] = '\0';  //ret[4] == '\0' correct;
 	return(ret);
 }
+
 char    *get_line(char *buff)
 {
 	int nl_i = ft_strchr(buff, '\n');
-		if(nl_i == -1)
-			return NULL;
+	if (nl_i == -1)
+		return NULL;
 	char *ret = malloc(nl_i + 1);
 	int i;
 	i = 0;
-	while(i < nl_i)
+	while(i < nl_i+1)
 	{
 		ret[i] = buff[i];
 		i++;
@@ -89,7 +92,8 @@ char    *get_line(char *buff)
 	ret[i] = '\0';
 	return(ret);
 }
-char *read_to_buff(char *buff, int fd)
+
+char *read_to_buff(char*buff, int fd)
 {
 	char *curr_read = malloc(BUFSIZE + 1);
 	if(curr_read == NULL)
@@ -99,6 +103,7 @@ char *read_to_buff(char *buff, int fd)
 	bytes = 1;
 	while(bytes > 0 && ft_strchr(buff, '\n') == -1)
 	{
+
 		bytes = read(fd, curr_read, BUFSIZE);
 		if(bytes == 0) // End of File reached
 			break;
@@ -119,8 +124,16 @@ char *get_next_line(int fd)
 	static char *buffer; //static that will hold my buffers indefinitely
 	char *ret;
 	buffer = read_to_buff(buffer, fd); // Returns buffer with atleast one /n or EOF
+	//printf("After initial reading \n\n%s\n\n", buffer);
 	ret = get_line(buffer);
-	buffer = get_remainder(buffer);
+	if(ret == NULL)
+	{
+		ret = buffer;
+		buffer = NULL;
+	}
+	else
+		buffer = get_remainder(buffer);
+	//printf("After separating remainder \n\n%s\n\n", buffer);
 	return(ret);
 }
 
@@ -135,5 +148,10 @@ int main(int argc, char **argv)
 
 	char *res;
 	res = get_next_line(fd);
-	printf("%s", res);
+	while (res)
+	{
+		puts(res);
+		free(res);
+		res = get_next_line(fd);
+	}
 }
