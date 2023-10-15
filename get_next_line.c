@@ -7,16 +7,16 @@ char    *get_remainder(char *buff)
 	char *ret;
 	int i;
 
-	start = ft_strchr(buff, '\n');
-	if(start == -1)
+	start = ft_strchr(buff, '\n'); 	// find 1st /n in buffer
+	if(start == -1)					// if not found, buffer is the remainder
 		return buff;
-	start += 1;
+	start ++;						// start ++ cause we dont want to copy /n to remainder
 	ret_size = ft_strlen(buff) - start;
 	ret = malloc(ret_size + 1); 	
 	if(ret == NULL)
 		return(NULL);
 	i = 0;
-	while(start <= ft_strlen(buff))
+	while(start <= ft_strlen(buff)) // <= to copy /0
 	{
 		ret[i] = buff[start];
 		i ++;
@@ -61,7 +61,7 @@ char *read_to_buff(char*buff, int fd)
 	{
 		bytes = read(fd, curr_read, BUFSIZE);
 		if(bytes == 0) // End of File reached
-			break;
+			break ;
 		if(bytes == -1) // Read threw an erroru6o
 		{
 			free(curr_read);
@@ -83,12 +83,23 @@ char *get_next_line(int fd)
 	buffer = read_to_buff(buffer, fd); // Returns buffer with atleast one /n or EOF
 	if(buffer == NULL)
 		return(NULL);
+	if (!*buffer)
+	{
+		free(buffer);
+		return(NULL);
+	}
 	ret = get_line(buffer);
-	buffer = get_remainder(buffer);
+	if(ret == NULL)
+	{
+		ret = buffer;
+		buffer = NULL;
+	}
+	else
+		buffer = get_remainder(buffer);
 	return(ret);
 }
 
-/*  int main(int argc, char **argv)
+/* int main(int argc, char **argv)
 {
 	(void)argc;
 	(void)argv;

@@ -20,12 +20,13 @@ int ft_strchr(char *s, int c)
 		return (-1);
 	while(s[i])
 	{
-		if((unsigned char)s[i] == c)
+		if(s[i] == c)
 			return i;
 		i++;
 	}
 	return (-1);
 }
+
 char *strjoin(char *s1, char *s2)
 {
 	char *line;
@@ -35,9 +36,9 @@ char *strjoin(char *s1, char *s2)
 	i = 0;
 	j = 0;
 	line = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
-	if(line == NULL)
+	if (line == NULL)
 		return (NULL);
-	if(s1)
+	if (s1)
 	{
 		while (s1[i])
 		{
