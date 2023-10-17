@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
+/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hescoval <hescoval@student.42porto.co      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/16 17:52:26 by hescoval          #+#    #+#             */
-/*   Updated: 2023/10/16 17:52:26 by hescoval         ###   ########.fr       */
+/*   Created: 2023/10/16 17:53:35 by hescoval          #+#    #+#             */
+/*   Updated: 2023/10/16 17:53:36 by hescoval         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 int	ft_strlen(char *str)
 {
@@ -50,11 +50,7 @@ char	*strjoin(char *s1, char *s2)
 	j = 0;
 	line = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
 	if (line == NULL)
-	{
-		free(s1);
-		free(s2);
 		return (NULL);
-	}
 	if (s1)
 	{
 		while (s1[i])

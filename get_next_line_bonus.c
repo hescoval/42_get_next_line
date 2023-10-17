@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: hescoval <hescoval@student.42porto.co      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/16 17:50:27 by hescoval          #+#    #+#             */
-/*   Updated: 2023/10/16 17:50:28 by hescoval         ###   ########.fr       */
+/*   Created: 2023/10/16 17:52:39 by hescoval          #+#    #+#             */
+/*   Updated: 2023/10/16 17:52:40 by hescoval         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 char	*get_remainder(char *buff)
 {
@@ -76,14 +76,12 @@ char	*read_to_buff(char*buff, int fd)
 			break ;
 		if (bytes == -1)
 		{
-			free(curr_read);
 			free(buff);
+			free(curr_read);
 			return (NULL);
 		}
 		curr_read[bytes] = '\0';
 		buff = strjoin(buff, curr_read);
-		if(buff == NULL)
-			return(NULL);
 	}
 	free(curr_read);
 	return (buff);
@@ -91,39 +89,39 @@ char	*read_to_buff(char*buff, int fd)
 
 char	*get_next_line(int fd)
 {
-	static char	*buffer;
+	static char	*buffer[FILEMAX];
 	char		*ret;
 
 	if (fd < 0 || BUFFER_SIZE < 0)
 		return (NULL);
-	buffer = read_to_buff(buffer, fd);
-	if (buffer == NULL)
+	buffer[fd] = read_to_buff(buffer[fd], fd);
+	if (buffer[fd] == NULL)
 		return (NULL);
-	if (!*buffer)	
+	if (!*buffer[fd])
 	{
-		free(buffer);
+		free(buffer[fd]);
 		return (NULL);
 	}
-	ret = get_l(buffer);
+	ret = get_l(buffer[fd]);
 	if (ret == NULL)
 	{
-		ret = buffer;
-		buffer = NULL;
+		ret = buffer[fd];
+		buffer[fd] = NULL;
 	}
 	else
-		buffer = get_remainder(buffer);
+		buffer[fd] = get_remainder(buffer[fd]);
 	return (ret);
 }
-
- int main(int argc, char **argv)
+/* 
+int main(int argc, char **argv)
 {
 	(void)argc;
 	(void)argv;
-	char *res;
-	int fd;
 
+	int fd;
 	if((fd = open("test.txt", O_RDONLY)) == -1)
 		return (-1);
+	char *res;
 	res = get_next_line(fd);
 	while (res)
 	{
@@ -131,4 +129,4 @@ char	*get_next_line(int fd)
 		free(res);
 		res = get_next_line(fd);
 	}
-}
+} */
