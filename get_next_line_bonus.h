@@ -23,8 +23,9 @@
 #  define FILEMAX 1024
 # endif
 
-int		ft_strlen(char *str);
-char	*strjoin(char *s1, char *s2);
-int		ft_strchr(char *s, int c);
+size_t	ft_strlen(char *s);
+int		ft_strcontains(char *s, char c);
+char	*ft_strcpy_nl(char *dest, char *src, int nl_stop);
+char	*ft_strjoin_special(char *s1, char *s2);
 char	*get_next_line(int fd);
 #endif

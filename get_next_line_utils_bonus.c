@@ -1,67 +1,74 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line_utils_bonus.c                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hescoval <hescoval@student.42porto.co      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/16 17:53:35 by hescoval          #+#    #+#             */
-/*   Updated: 2023/10/16 17:53:36 by hescoval         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "get_next_line.h"
 
-#include "get_next_line_bonus.h"
+size_t	ft_strlen(char *s)		//Straightforward strlen
+{ 
+	size_t	i;
 
-int	ft_strlen(char *str)
-{
-	int	i;
-
-	i = 0;
-	if (!str)
+	if (s == NULL)		//Make sure we check if its NULL before playing with it (Invalid read size 1)
 		return (0);
-	while (str[i])
+	i = 0;
+	while (s[i])
 		i++;
 	return (i);
+ } 
+
+int	ft_strcontains(char *s, char c)		//Straightforward strchr
+{
+		unsigned int	i;
+
+		if (s == NULL)
+			return (0);
+		i = 0;
+		while (s[i] != '\0')
+		{
+			if (s[i] == c)
+				return (1);
+			i++;
+		}
+		return (0);
 }
 
-int	ft_strchr(char *s, int c)
+char	*ft_strcpy_nl(char *dest, char *src, int nl_stop) 
 {
-	int	i;
+	size_t	i;
 
 	i = 0;
-	if (s == NULL)
-		return (-1);
-	while (s[i])
+	while (src[i] != '\0')
 	{
-		if (s[i] == c)
-			return (i);
+		dest[i] = src[i];
+		if (nl_stop && src[i] == '\n')
+		{
+			i++;
+			break ;
+		}
 		i++;
 	}
-	return (-1);
+		dest[i] = '\0';
+		return (dest);
 }
 
-char	*strjoin(char *s1, char *s2)
+char	*ft_strjoin_special(char *s1, char *s2)	//	Straightforward strjoin, check for s1 == NULL and s2 == NULL in loops
 {
-	char	*line;
+	char	*join;
+	size_t	len;
 	int		i;
 	int		j;
 
-	i = 0;
-	j = 0;
-	line = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
-	if (line == NULL)
+	len = ft_strlen(s1) + ft_strlen(s2);		//	Calculate length of return string
+	join = malloc(sizeof(char) * (len + 1));	//	Malloc with +1 for Null
+	if (join == NULL)
 		return (NULL);
-	if (s1)
+	i = 0;
+	while (s1 != NULL && s1[i] != '\0')
 	{
-		while (s1[i])
-		{
-			line[i] = s1[i];
-			i++;
-		}
+		join[i] = s1[i];
+		i++;
 	}
-	while (s2[j])
-		line[i++] = s2[j++];
-	line[i] = '\0';
-	free(s1);
-	return (line);
+	j = 0;
+	while (s2 != NULL && s2[j] != '\0')
+		join[i++] = s2[j++];
+	join[len] = '\0';
+	if (s1 != NULL)	// s1 is our buffer, its about to be replaced. free it
+		free(s1);
+	return (join);
 }

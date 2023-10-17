@@ -1,132 +1,84 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hescoval <hescoval@student.42porto.co      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/10/16 17:52:39 by hescoval          #+#    #+#             */
-/*   Updated: 2023/10/16 17:52:40 by hescoval         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "get_next_line_bonus.h" 
 
-#include "get_next_line_bonus.h"
-
-char	*get_remainder(char *buff)
+char	*ft_fill(int fd, char *data)
 {
-	int		start;
-	int		ret_size;
-	char	*ret;
-	int		i;
+	int		bytes_read;
+	char	*buffer;
 
-	start = ft_strchr(buff, '\n');
-	if (start == -1)
-		return (buff);
-	start ++;
-	ret_size = ft_strlen(buff) - start;
-	ret = malloc(ret_size + 1);
-	if (ret == NULL)
+	buffer = malloc(BUFFER_SIZE + 1);		// Allocate enough memory for all we want to read, plus the '/0'
+	if (buffer == NULL)
 		return (NULL);
-	i = 0;
-	while (start <= ft_strlen(buff))
+	bytes_read = 1;			// Jumpstart the loop
+	while (!ft_strcontains(data, '\n') && bytes_read != 0)		//strchr(buff, \n) && read more than one byte
 	{
-		ret[i] = buff[start];
-		i ++;
-		start ++;
-	}
-	free(buff);
-	return (ret);
-}
-
-char	*get_l(char *buff)
-{
-	int		nl_i;
-	char	*ret;
-	int		i;
-
-	nl_i = ft_strchr(buff, '\n');
-	if (nl_i == -1)
-		return (NULL);
-	ret = malloc(nl_i + 2);
-	if (ret == NULL)
-		return (NULL);
-	i = 0;
-	while (i <= nl_i)
-	{
-		ret[i] = buff[i];
-		i++;
-	}
-	ret[i] = '\0';
-	return (ret);
-}
-
-char	*read_to_buff(char*buff, int fd)
-{
-	char	*curr_read;
-	int		bytes;
-
-	curr_read = malloc(BUFFER_SIZE + 1);
-	if (curr_read == NULL)
-		return (NULL);
-	bytes = 1;
-	while (bytes > 0 && ft_strchr(buff, '\n') == -1)
-	{
-		bytes = read(fd, curr_read, BUFFER_SIZE);
-		if (bytes == 0)
-			break ;
-		if (bytes == -1)
+		bytes_read = read(fd, buffer, BUFFER_SIZE);
+		if (bytes_read == -1)		//Deal with error thrown by read
 		{
-			free(buff);
-			free(curr_read);
+			free(buffer);			//Free our buffer
+			if (data != NULL)		//If data is not already NULL, free.
+				free(data);
 			return (NULL);
 		}
-		curr_read[bytes] = '\0';
-		buff = strjoin(buff, curr_read);
+			buffer[bytes_read] = '\0';	//Put the NULL at the end of our buffer
+			data = ft_strjoin_special(data, buffer);		//strjoin our static var with buffer
 	}
-	free(curr_read);
-	return (buff);
+	free(buffer);		//Buffer done its job, free.
+	return (data);
+}
+
+char		*ft_extract_line(char *data)
+{
+	char		*line;
+	size_t		len;
+	int			i;
+
+	if (data[0] == '\0')	//If the first character of the static var is a '\0', the file is over, return NULL.
+		return (NULL);
+	i = 0;
+	while (data[i] != '\0' && data[i] != '\n')	// Copy until we reach either a '\0' or a '\n'
+		i++;
+	len = i;
+	if(data[i] == '\n')	// As requested, if the line ends in a new line, we must include it.
+		len++;
+	line = malloc(len + 1);	// Normal malloc
+	if (line == NULL)
+		return (NULL);
+	ft_strcpy_nl(line, data, 1); // Copy everything up until the newline
+	return (line);
+}
+
+char	*ft_update_data(char *old_data)
+{
+	char		*new_data;
+	int			start;
+
+	start = 0;															//Simple way to check if everything was printed or not.
+	while (old_data[start] != '\0' && old_data[start] != '\n')			//Updating data	
+		start++;														//Old data is "Simple\nTest"	//Old data is "SimpleTest"
+	if (old_data[start] == '\0')										//Line was Simple\n				//Line was SimpleTest
+	{																	//New data should be Test		//New data shoulde be NULL
+		free(old_data);																					//since everything was printed
+		return (NULL);
+	}
+	new_data = malloc(sizeof(char) * (ft_strlen(old_data + start) + 1));	//Calculate the length of the string at the start point.
+	if (new_data == NULL)
+		return (NULL);
+	ft_strcpy_nl(new_data, old_data + start + 1, 0);	//Copy the string into the new malloc from the position after '\n'
+	free(old_data);	//free old buffer, since its being replaced.
+	return (new_data);
 }
 
 char	*get_next_line(int fd)
-{
-	static char	*buffer[FILEMAX];
-	char		*ret;
+{ 
+		char		*line;
+		static char	*data[FILEMAX];
 
-	if (fd < 0 || BUFFER_SIZE < 0)
-		return (NULL);
-	buffer[fd] = read_to_buff(buffer[fd], fd);
-	if (buffer[fd] == NULL)
-		return (NULL);
-	if (!*buffer[fd])
-	{
-		free(buffer[fd]);
-		return (NULL);
-	}
-	ret = get_l(buffer[fd]);
-	if (ret == NULL)
-	{
-		ret = buffer[fd];
-		buffer[fd] = NULL;
-	}
-	else
-		buffer[fd] = get_remainder(buffer[fd]);
-	return (ret);
+		if (fd < 0 || BUFFER_SIZE <= 0) // Deal with invalid fd and buffer sizes
+				return (NULL);
+		data[fd] = ft_fill(fd, data[fd]);		// Fill up our static var
+		if (data[fd] == NULL)				// If static var return NULL, return NULL.
+			return (NULL);
+		line = ft_extract_line(data[fd]);	// Get the line that user wants returned
+		data[fd] = ft_update_data(data[fd]);	// Update the Static var with rest of content
+		return (line);
 }
-/* 
-int main(int argc, char **argv)
-{
-	(void)argc;
-	(void)argv;
-
-	int fd;
-	if((fd = open("test.txt", O_RDONLY)) == -1)
-		return (-1);
-	char *res;
-	res = get_next_line(fd);
-	while (res)
-	{
-		printf("%s", res);
-		free(res);
-		res = get_next_line(fd);
-	}
-} */
