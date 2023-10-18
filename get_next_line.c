@@ -57,7 +57,7 @@ char	*ft_update_data(char *old_data)
 		start++;								//Old data is "Simple\nTest"	//Old data is "SimpleTest"
 	if (old_data[start] == '\0')							//Line was Simple\n		//Line was SimpleTest
 	{										//New data should be Test	//New data shoulde be NULL
-		free(old_data);																					//since everything was printed
+		free(old_data);												//since everything was printed
 		return (NULL);
 	}
 	new_data = malloc(sizeof(char) * (ft_strlen(old_data + start) + 1));	//Calculate the length of the string at the start point.
