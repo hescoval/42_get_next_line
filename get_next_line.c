@@ -52,11 +52,11 @@ char	*ft_update_data(char *old_data)
 	char		*new_data;
 	int			start;
 
-	start = 0;															//Simple way to check if everything was printed or not.
+	start = 0;									//Simple way to check if everything was printed or not.
 	while (old_data[start] != '\0' && old_data[start] != '\n')			//Updating data	
-		start++;														//Old data is "Simple\nTest"	//Old data is "SimpleTest"
-	if (old_data[start] == '\0')										//Line was Simple\n				//Line was SimpleTest
-	{																	//New data should be Test		//New data shoulde be NULL
+		start++;								//Old data is "Simple\nTest"	//Old data is "SimpleTest"
+	if (old_data[start] == '\0')							//Line was Simple\n		//Line was SimpleTest
+	{										//New data should be Test	//New data shoulde be NULL
 		free(old_data);																					//since everything was printed
 		return (NULL);
 	}
@@ -64,7 +64,7 @@ char	*ft_update_data(char *old_data)
 	if (new_data == NULL)
 		return (NULL);
 	ft_strcpy_nl(new_data, old_data + start + 1, 0);	//Copy the string into the new malloc from the position after '\n'
-	free(old_data);	//free old buffer, since its being replaced.
+	free(old_data);						//free old buffer, since its being replaced.
 	return (new_data);
 }
 
